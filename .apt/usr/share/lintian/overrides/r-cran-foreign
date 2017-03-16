@@ -1,0 +1,2 @@
+r-cran-foreign: extra-license-file usr/lib/R/library/foreign/LICENCE
+r-cran-foreign: executable-not-elf-or-script usr/lib/R/library/foreign/files/sids.dbf

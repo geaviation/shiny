@@ -1,0 +1,5 @@
+# Versioned soname is not necessary for libtk8.5.so
+libtk8.5: shlib-without-versioned-soname
+# Since the library has no suffix after .so then the symlink
+# is not necessary
+libtk8.5: dev-pkg-without-shlib-symlink

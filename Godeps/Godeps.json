@@ -1,0 +1,88 @@
+{
+	"ImportPath": "github.build.ge.com/unshut/goboot-shiny",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.build.ge.com/unshut/goboot/config",
+			"Rev": "f9d09a957c3cb846bc0818b8d2efe68afe8a5213"
+		},
+		{
+			"ImportPath": "github.build.ge.com/unshut/goboot/logging",
+			"Rev": "f9d09a957c3cb846bc0818b8d2efe68afe8a5213"
+		},
+		{
+			"ImportPath": "github.build.ge.com/unshut/goboot/web",
+			"Rev": "f9d09a957c3cb846bc0818b8d2efe68afe8a5213"
+		},
+		{
+			"ImportPath": "github.build.ge.com/unshut/goboot/web/gorilla",
+			"Rev": "f9d09a957c3cb846bc0818b8d2efe68afe8a5213"
+		},
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.11.4-2-g1deb2db",
+			"Rev": "1deb2db2a6fff8a35532079061b903c3a25eed52"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-community/go-cfenv",
+			"Comment": "v1.15.0",
+			"Rev": "3b3d4d0e3aaeae8f0b7d0d41257228e92cef463e"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Comment": "v1.3.0-5-g599cba5",
+			"Rev": "599cba5e7b6137d46ddf58fb1765f5d928e69604"
+		},
+		{
+			"ImportPath": "github.com/kr/pty",
+			"Comment": "v1.0.0",
+			"Rev": "2c10821df3c3cf905230d078702dfbe9404c9b23"
+		},
+		{
+			"ImportPath": "github.com/mitchellh/mapstructure",
+			"Rev": "53818660ed4955e899c0bcafa97299a388bd7c8e"
+		},
+		{
+			"ImportPath": "github.com/tylerb/graceful",
+			"Comment": "v1.2.15-3-gd72b015",
+			"Rev": "d72b0151351a13d0421b763b88f791469c4f5dc7"
+		},
+		{
+			"ImportPath": "golang.org/x/net/websocket",
+			"Rev": "a6577fac2d73be281a500b310739095313165611"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "99f16d856c9836c42d24e7ab64ea72916925fa97"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding",
+			"Rev": "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/internal",
+			"Rev": "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/internal/identifier",
+			"Rev": "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/unicode",
+			"Rev": "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
+		},
+		{
+			"ImportPath": "golang.org/x/text/internal/utf8internal",
+			"Rev": "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
+		},
+		{
+			"ImportPath": "golang.org/x/text/runes",
+			"Rev": "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
+		},
+		{
+			"ImportPath": "golang.org/x/text/transform",
+			"Rev": "f28f36722d5ef2f9655ad3de1f248e3e52ad5ebd"
+		}
+	]
+}

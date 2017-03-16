@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Jim Hester" />
+
+<meta name="date" content="2016-12-05" />
+
+<title>Server Log Parsing</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Server Log Parsing</h1>
+<h4 class="author"><em>Jim Hester</em></h4>
+<h4 class="date"><em>2016-12-05</em></h4>
+
+
+
+<p>Parsing server log files is a common task in server administration. <a href="http://link.springer.com/article/10.1007/BF03325089">1</a>,<a href="http://stackoverflow.com/search?q=%22Apache+log%22">2</a> Historically R would not be well suited to this and it would be better performed using a scripting language such as perl. Rex, however, makes this easy to do and allows you to perform both the data cleaning and analysis in R!</p>
+<p>Common server logs consist of space separated fields.</p>
+<blockquote>
+<p>198.214.42.14 - - [21/Jul/1995:14:31:46 -0400] “GET /images/ HTTP/1.0” 200 17688</p>
+</blockquote>
+<blockquote>
+<p>lahal.ksc.nasa.gov - - [24/Jul/1995:12:42:40 -0400] “GET /images/USA-logosmall.gif HTTP/1.0” 200 234</p>
+</blockquote>
+<p>The logs used in this vignette come from two months of all HTTP requests to the NASA Kennedy Space Center WWW server in Florida and are freely available for use. <a href="http://ita.ee.lbl.gov/html/contrib/NASA-HTTP.html">3</a></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">parsed &lt;-<span class="st"> </span><span class="kw">scan</span>(<span class="st">&quot;NASA.txt&quot;</span>, <span class="dt">what =</span> <span class="st">&quot;character&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>) %&gt;%
+<span class="st">  </span><span class="kw">re_matches</span>(
+    <span class="kw">rex</span>(
+
+      <span class="co"># Get the time of the request</span>
+      <span class="st">&quot;[&quot;</span>,
+        <span class="kw">capture</span>(<span class="dt">name =</span> <span class="st">&quot;time&quot;</span>,
+          <span class="kw">except_any_of</span>(<span class="st">&quot;]&quot;</span>)
+        ),
+      <span class="st">&quot;]&quot;</span>,
+
+      space, double_quote, <span class="st">&quot;GET&quot;</span>, space,
+
+      <span class="co"># Get the filetype of the request if requesting a file</span>
+      <span class="kw">maybe</span>(
+        non_spaces, <span class="st">&quot;.&quot;</span>,
+        <span class="kw">capture</span>(<span class="dt">name =</span> <span class="st">&quot;filetype&quot;</span>,
+          <span class="kw">except_some_of</span>(space, <span class="st">&quot;.&quot;</span>, <span class="st">&quot;?&quot;</span>, double_quote)
+        )
+      )
+    )
+  ) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">filetype =</span> <span class="kw">tolower</span>(filetype),
+         <span class="dt">time =</span> <span class="kw">as.POSIXct</span>(time, <span class="dt">format=</span><span class="st">&quot;%d/%b/%Y:%H:%M:%S %z&quot;</span>))</code></pre></div>
+<p>This gives us a nicely formatted data frame of the time and filetypes of the requests.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">time</th>
+<th align="left">filetype</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1995-07-21 20:31:46</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">1995-07-24 18:42:40</td>
+<td align="left">gif</td>
+</tr>
+<tr class="odd">
+<td align="left">1995-07-02 08:30:34</td>
+<td align="left">gif</td>
+</tr>
+<tr class="even">
+<td align="left">1995-07-05 19:51:39</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">1995-07-11 05:11:49</td>
+<td align="left">gif</td>
+</tr>
+<tr class="even">
+<td align="left">1995-07-15 17:27:49</td>
+<td align="left">mpg</td>
+</tr>
+<tr class="odd">
+<td align="left">1995-07-13 17:02:50</td>
+<td align="left">xbm</td>
+</tr>
+<tr class="even">
+<td align="left">1995-07-23 15:11:06</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">1995-07-14 16:38:04</td>
+<td align="left">gif</td>
+</tr>
+<tr class="even">
+<td align="left">1995-07-25 15:33:01</td>
+<td align="left">gif</td>
+</tr>
+</tbody>
+</table>
+<p>We can also easily generate a histogram of the filetypes, or a plot of requests over time.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="kw">na.omit</span>(parsed)) +<span class="st"> </span><span class="kw">stat_count</span>(<span class="kw">aes</span>(<span class="dt">x=</span>filetype))
+<span class="kw">ggplot</span>(<span class="kw">na.omit</span>(parsed)) +<span class="st"> </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">x=</span>time)) +<span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Requests over time&quot;</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><img src="data:image/png;base64,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" /></p>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

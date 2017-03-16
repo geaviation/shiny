@@ -1,0 +1,1 @@
+../../../share/pyshared/svg_regex.py

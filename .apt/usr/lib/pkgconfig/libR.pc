@@ -1,0 +1,10 @@
+rhome=/usr/lib/R
+rlibdir=${rhome}/lib
+rincludedir=/usr/share/R/include
+
+Name: libR
+Description: R as a library
+Version: 3.0.2
+Libs: -L${rlibdir} -lR
+Cflags: -I${rincludedir} -I${rincludedir}
+Libs.private:

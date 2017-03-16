@@ -1,0 +1,22 @@
+---
+applications:
+- name: ${APP_EXE}-${ENV}
+  memory: 4G
+  disk_quota: 2G
+  instances: 1
+  command: /app/bin/${APP_EXE}
+  buildpack: https://github.com/cloudfoundry/go-buildpack.git
+#  services:
+#    - goboot-rabbitmq
+#    - goboot-postgres
+#    - goboot-logstash
+#    - goboot-redis
+  env:
+    goboot_logging: >
+      {
+        \"level\": \"$log_level\"
+      }
+    version: $VERSION
+    build: $BUILD
+#
+
